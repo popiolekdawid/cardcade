@@ -50,8 +50,10 @@ npm install
 
 Create a .env file in the root directory.
 Add the following environment variables:
+```
 MONGODB_URI: MongoDB connection URI
 JWT_SECRET: Secret key for JWT authentication
+```
 
 Start the application:
 ```
