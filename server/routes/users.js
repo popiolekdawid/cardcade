@@ -73,24 +73,40 @@ router.delete("/", tokenVerification, async (req, res) => {
     });
 });
 
-router.post("/flashcards", tokenVerification, async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const { word, translation } = req.body;
+const { body, validationResult } = require("express-validator");
 
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).send({ message: "User not found" });
+router.post(
+  "/flashcards",
+  tokenVerification,
+  [
+    body("word").notEmpty().withMessage("Word is required"),
+    body("translation").notEmpty().withMessage("Translation is required"),
+  ],
+  async (req, res) => {
+    try {
+      const userId = req.user._id;
+      const { word, translation } = req.body;
+
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).send({ message: "User not found" });
+      }
+
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      user.flashcards.push({ word, translation });
+      await user.save();
+
+      res.status(201).send({ message: "Flashcard added successfully" });
+    } catch (error) {
+      res.status(500).send({ message: "Internal Server Error" });
     }
-
-    user.flashcards.push({ word, translation });
-    await user.save();
-
-    res.status(201).send({ message: "Flashcard added successfully" });
-  } catch (error) {
-    res.status(500).send({ message: "Internal Server Error" });
   }
-});
+);
+
 
 router.get("/flashcards", tokenVerification, async (req, res) => {
   try {
@@ -106,6 +122,61 @@ router.get("/flashcards", tokenVerification, async (req, res) => {
   }
 });
 
+router.delete("/flashcards/:id", tokenVerification, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const flashcardId = req.params.id;
 
+    const user = await User.findById(userId);
+    console.log(`User: ${user}`);
+
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    const updatedFlashcards = user.flashcards.filter(
+      (flashcard) => flashcard._id.toString() !== flashcardId
+    );
+
+    if (user.flashcards.length === updatedFlashcards.length) {
+      return res.status(404).send({ message: "Flashcard not found" });
+    }
+
+    user.flashcards = updatedFlashcards;
+    await user.save();
+
+    res.status(200).send({ message: "Flashcard deleted" });
+  } catch (error) {
+    res.status(500).send({ message: error.message });
+  }
+});
+
+router.put("/flashcards/:id", tokenVerification, async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const flashcardId = req.params.id;
+    const { word, translation } = req.body;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).send({ message: "User not found" });
+    }
+
+    const flashcard = user.flashcards.id(flashcardId);
+    if (!flashcard) {
+      return res.status(404).send({ message: "Flashcard not found" });
+    }
+
+    // Update the flashcard properties
+    flashcard.word = word;
+    flashcard.translation = translation;
+
+    await user.save();
+
+    res.status(200).send({ message: "Flashcard updated successfully" });
+  } catch (error) {
+    res.status(500).send({ message: "Internal Server Error" });
+  }
+});
 
 module.exports = router;
