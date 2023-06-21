@@ -61,3 +61,20 @@ npm start
 ```
 
 Open your web browser and visit http://localhost:3000 to start learning.
+
+
+## Screenshots
+
+Your flashcards:
+<img width="1275" alt="Screenshot 2023-06-21 at 14 34 41" src="https://github.com/popiolekdawid/cardcade/assets/112573508/52cd310a-3799-468a-8337-fd958b40853d">
+
+Add new flashcard:
+<img width="1275" alt="Screenshot 2023-06-21 at 14 34 59" src="https://github.com/popiolekdawid/cardcade/assets/112573508/2b343e8f-6da8-492a-9ed8-b8b4c6772156">
+
+Sign up screen:
+<img width="1275" alt="Screenshot 2023-06-21 at 14 27 44" src="https://github.com/popiolekdawid/cardcade/assets/112573508/1a629bb6-d124-44bb-9f07-b0f8e3c2404d">
+
+Sign in screen:
+<img width="1275" alt="Screenshot 2023-06-21 at 14 28 27" src="https://github.com/popiolekdawid/cardcade/assets/112573508/0cfd9f74-9480-4cc5-b1f6-035a5cd18f47">
+
+
