@@ -1,5 +1,5 @@
-# cardcade
-New way to memorise, faster.
+# Cardcade
+*New way to memorise, faster.*
 
 This is a web application that allows users to manage their flashcards. Users can create, view, edit, and delete flashcards. The application provides features such as user authentication, profile management, and flashcard management.
 
