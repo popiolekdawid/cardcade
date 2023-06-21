@@ -3,13 +3,17 @@ import { useState } from "react";
 import axios from "axios";
 import Users from "./Users";
 import Profile from "./Profile";
+import Flashcards from "./Flashcards/Flashcards";
 
 const Main = () => {
   const [dane, ustawDane] = useState([]);
   const [profile, setProfile] = useState([]);
+  const [flashcards, setFlashcards] = useState([]);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const userDiv = document.getElementById("usersDiv");
   const profileDiv = document.getElementById("profileDiv");
+  const flashcardsDiv = document.getElementById("flashcardsDiv");
 
   const handleGetUsers = async (e) => {
     e.preventDefault();
@@ -33,6 +37,7 @@ const Main = () => {
         //z serwera – jeśli został poprawnie zweryfikowany token
         ustawDane(res.data); // `res.data` - zawiera sparsowane dane – listę
         profileDiv.style.display = "none";
+        flashcardsDiv.style.display = "none";
         userDiv.style.display = "block";
       } catch (error) {
         if (
@@ -65,9 +70,45 @@ const Main = () => {
         };
         // Wysłanie żądania o dane:
         const { data: res } = await axios(config);
-        setProfile(res.data); // Display the detailed user information in the console
+        setProfile(res.data);
         userDiv.style.display = "none";
+        flashcardsDiv.style.display = "none";
         profileDiv.style.display = "block";
+      } catch (error) {
+        if (
+          error.response &&
+          error.response.status >= 400 &&
+          error.response.status <= 500
+        ) {
+          localStorage.removeItem("token");
+          window.location.reload();
+        }
+      }
+    }
+  };
+
+  const handleShowFlashcards = async (e) => {
+    e.preventDefault();
+    // Pobierz token z localStorage:
+    const token = localStorage.getItem("token");
+    // Jeśli jest token w localStorage:
+    if (token) {
+      try {
+        // Konfiguracja zapytania asynchronicznego z tokenem w nagłówku:
+        const config = {
+          method: "get",
+          url: "http://localhost:8080/api/users/flashcards",
+          headers: {
+            "Content-Type": "application/json",
+            "x-access-token": token,
+          },
+        };
+        // Wysłanie żądania o dane:
+        const { data: res } = await axios(config);
+        setFlashcards(res.flashcards);
+        userDiv.style.display = "none";
+        profileDiv.style.display = "none";
+        flashcardsDiv.style.display = "block";
       } catch (error) {
         if (
           error.response &&
@@ -98,6 +139,7 @@ const Main = () => {
             },
           };
           const response = await axios(config);
+          console.log(`Delete message:`);
           console.log(response.data);
           localStorage.removeItem("token");
           window.location.reload();
@@ -120,31 +162,30 @@ const Main = () => {
     window.location.reload();
   };
 
+  const toggleMenu = () => {
+    setMenuOpen((prevMenuOpen) => !prevMenuOpen);
+  };
+
   return (
     <div className={styles.main_container}>
       <nav className={styles.navbar}>
-        <h1>MySite</h1>
-        <div className={styles.button}>
-          <button
-            id="usersBtn"
-            className={styles.white_btn}
-            onClick={handleGetUsers}
-          >
-            Get Users
-          </button>
-          <button
-            id="profileBtn"
-            className={styles.white_btn}
-            onClick={handleShowProfile}
-          >
-            Profile Info
-          </button>
-          <button className={styles.white_btn} onClick={handleDeleteProfile}>
-            Delete Profile
-          </button>
-          <button className={styles.white_btn} onClick={handleLogout}>
-            Logout
-          </button>
+        <div className={styles.header}>
+          <img src="/favicon.ico" alt="icon" className={styles.logo} />
+          <h1>Cardcade</h1>
+        </div>
+        <div className={styles.dropdown}>
+          <div onClick={toggleMenu} className={styles.menuIcon}><>&#8801;</></div>
+            {menuOpen && (
+              <div className={styles.menu}>
+                <button onClick={handleShowFlashcards}>Your Flashcards</button>
+                <div className={styles.divider} />
+                <button onClick={handleGetUsers}>Get Users</button>
+                <button onClick={handleShowProfile}>Profile Info</button>
+                <button onClick={handleDeleteProfile}>Delete Profile</button>
+                <div className={styles.divider} />
+                <button onClick={handleLogout}>Logout</button>
+              </div>
+            )}
         </div>
       </nav>
       <div id="usersDiv" className={styles.list}>
@@ -160,6 +201,14 @@ const Main = () => {
           <>
             <h2>Profile Info:</h2>
             <Profile profile={profile} />
+          </>
+        )}
+      </div>
+      <div id="flashcardsDiv" className={styles.list}>
+      {flashcards.length !== 0 && (
+          <>
+            <h2>Your flashcards:</h2>
+            <Flashcards flashcards={flashcards}/>
           </>
         )}
       </div>

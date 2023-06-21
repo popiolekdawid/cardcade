@@ -15,10 +15,10 @@ app.use(express.json());
 app.use(cors());
 
 // routes
-app.get("/api/users/",tokenVerification)
+app.get("/api/users/", tokenVerification)
 app.use("/api/auth", authRoutes)
 app.use("/api/users/", userRoutes)
 
 const port = process.env.PORT || 8080;
 
-app.listen(port, () => console.log(`Nasłuchiwanie na porcie ${port}`));
+app.listen(port, () => console.log(`Listening on port ${port}`));
