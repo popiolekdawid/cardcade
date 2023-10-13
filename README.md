@@ -37,7 +37,7 @@ This is a web application that allows users to manage their flashcards. Users ca
 1. Clone the repository:
 ```
 bash
-git clone <repository-url>
+git clone https://github.com/popiolekdawid/cardcade
  ```
 2. Install the dependencies:
 
